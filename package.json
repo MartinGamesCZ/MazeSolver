@@ -1,0 +1,24 @@
+{
+  "name": "social",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "solve": "bun run generate && bun run start && bun run edit",
+    "start": "bun x tsx src/index.ts",
+    "generate": "bun run src/generator.ts",
+    "edit": "cd output && ffmpeg -framerate 10 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p out.mp4 && cd .."
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@sbj42/maze-generator": "^2.0.6",
+    "@sbj42/maze-generator-backtrack": "^0.1.6",
+    "canvas": "^2.11.2",
+    "fs": "^0.0.1-security",
+    "generate-maze": "^1.1.0"
+  }
+}
