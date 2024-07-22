@@ -62,6 +62,10 @@ function solveMaze() {
   let isOnLastCross = false;
   let previouslyFoundCross = false;
   let moved = true;
+  let pathToCross: {
+    [key: string]: number[][];
+  } = {};
+  let currPath: number[][] = [];
 
   movePlayer(maze.start[0], maze.start[1]);
 
@@ -72,7 +76,7 @@ function solveMaze() {
   while (!solved) {
     console.log("--- NEXT FRAME ---");
 
-    console.log("Tile", playerCoords[0] + playerCoords[1] * maze.width);
+    console.log("Tile", playerCoords[0], playerCoords[1]);
 
     const canGoDown = checkCanGoDown();
     const canGoRight = checkCanGoRight();
@@ -80,8 +84,6 @@ function solveMaze() {
     const canGoLeft = checkCanGoLeft();
 
     moved = true;
-
-    console.log(isOnLastCross, stepBeforeLastCross, stepAfterLastCross);
 
     if (canGoRight) {
       goRight();
@@ -106,6 +108,8 @@ function solveMaze() {
       stepAfterLastCross = previousStep;
     }
 
+    currPath.push(playerCoords);
+
     if (!moved) {
       if (lastCross.length <= 0) continue;
 
@@ -115,6 +119,7 @@ function solveMaze() {
           lastCross[lastCross.length - 1][1],
         );
         isOnLastCross = true;
+        currPath = pathToCross[`${playerCoords[0]},${playerCoords[1]}`];
         console.log("Teleport at last cross", lastCross[lastCross.length - 1]);
       }
 
@@ -141,15 +146,18 @@ function solveMaze() {
         lastCross[lastCross.length - 1][0],
         lastCross[lastCross.length - 1][1],
       );
+
+      currPath = pathToCross[`${playerCoords[0]},${playerCoords[1]}`];
     }
 
     if (playerCoords[0] == maze.end[0] && playerCoords[1] == maze.end[1]) {
       console.log("SOLVED");
+      console.log(currPath);
       solved = true;
       renderFrame(frame);
       drawPlayer();
       saveFrame(frame);
-      continue;
+      break;
     }
 
     let canMove = getTile(playerCoords[0], playerCoords[1]).map((v) => !v);
@@ -162,6 +170,9 @@ function solveMaze() {
       )
         continue;
       lastCross.push(playerCoords);
+      if (!pathToCross[`${playerCoords[0]}:${playerCoords[1]}`])
+        pathToCross[`${playerCoords[0]},${playerCoords[1]}`] = [...currPath];
+      //currPath = pathToCross[`${playerCoords[0]},${playerCoords[1]}`];
       stepBeforeLastCross = previousStep;
       previouslyFoundCross = true;
       console.log("Found cross at", lastCross);
@@ -177,6 +188,12 @@ function solveMaze() {
     saveFrame(frame);
 
     frame++;
+  }
+
+  drawPath(currPath);
+
+  for (let x = 0; x < 10; x++) {
+    saveFrame("final" + x.toString().padStart(2, "0"));
   }
 
   console.log("Solved!");
@@ -307,11 +324,13 @@ function drawPlayerPath() {
   });
 }
 
-function saveFrame(n: number) {
-  if (n > Math.pow(maze.width, 2)) {
+function saveFrame(n: number | string) {
+  console.log(n);
+  if (typeof n != "string" && n > Math.pow(maze.width, 2)) {
     console.log("HALTED");
     return process.exit();
   }
+
   writeFileSync(
     `output/${n.toString().padStart(5, "0")}.png`,
     canvas.toBuffer(),
@@ -408,5 +427,34 @@ function drawCheckpoints() {
       1080 / maze.width,
       1080 / maze.height,
     );
+  });
+}
+
+function drawPath(path: number[][]) {
+  const cellSize = 1080 / maze.width;
+
+  ctx.lineWidth = 10;
+
+  ctx.beginPath();
+  ctx.moveTo(maze.start[0], maze.start[1]);
+
+  let prev: number[] = [];
+
+  path.forEach((coord, i) => {
+    if (i == 0) prev = [0, 0];
+
+    ctx.strokeStyle = "white";
+    ctx.beginPath();
+    ctx.moveTo(
+      prev[0] * cellSize + cellSize / 2,
+      prev[1] * cellSize + cellSize / 2,
+    );
+    ctx.lineTo(
+      coord[0] * cellSize + cellSize / 2,
+      coord[1] * cellSize + cellSize / 2,
+    );
+    ctx.stroke();
+
+    prev = coord;
   });
 }

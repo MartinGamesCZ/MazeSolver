@@ -1,8 +1,8 @@
 import gen from "generate-maze";
 import { writeFileSync } from "fs";
 
-const WIDTH = 10;
-const HEIGHT = 10;
+const WIDTH = 50;
+const HEIGHT = 50;
 
 const tiles = [];
 
