@@ -1,4 +1,4 @@
-# social
+# Maze Solver
 
 To install dependencies:
 
@@ -6,10 +6,10 @@ To install dependencies:
 bun install
 ```
 
+In src/generator.ts edit WIDTH and HEIGHT to change the size of the maze. 1:1 aspect ratio is recommended.
+
 To run:
 
 ```bash
-bun run src/index.ts
+bun run solve
 ```
-
-This project was created using `bun init` in bun v1.1.9. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
