@@ -1,5 +1,6 @@
 import { createCanvas, loadImage } from "canvas";
 import {
+  existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -27,6 +28,8 @@ let visited = new Set<string>();
 
 const canvas = createCanvas(1080, 1080);
 const ctx = canvas.getContext("2d");
+
+if (!existsSync("output")) mkdirSync("output");
 
 readdirSync("output").forEach((f) => {
   rmSync(`output/${f}`);
